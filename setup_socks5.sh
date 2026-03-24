@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # ============================================
-#   SOCKS5 (Dante) — автоустановка для Telegram
+#   SOCKS5 (Dante) — автоустановка
+#   Telegram + Browser
 # ============================================
 
 set -e
@@ -11,11 +12,12 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
 NC='\033[0m'
 
 echo -e "${CYAN}"
 echo "============================================"
-echo "   SOCKS5 прокси для Telegram (Dante)"
+echo "   SOCKS5 прокси — Telegram + Браузер"
 echo "============================================"
 echo -e "${NC}"
 
@@ -112,21 +114,41 @@ fi
 generate_links() {
     local USER="$1"
     local PASS="$2"
-    local LINK="https://t.me/socks?server=${SERVER_IP}&port=${PORT}&user=${USER}&pass=${PASS}"
-    local ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${LINK}', safe=''))" 2>/dev/null)
-    local SHORT=$(curl -s "https://clck.ru/--?url=${ENCODED}" 2>/dev/null || echo "")
+
+    # --- Telegram ---
+    local TG_LINK="https://t.me/socks?server=${SERVER_IP}&port=${PORT}&user=${USER}&pass=${PASS}"
+    local ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${TG_LINK}', safe=''))" 2>/dev/null)
+    local TG_SHORT=$(curl -s "https://clck.ru/--?url=${ENCODED}" 2>/dev/null || echo "")
     local QR_FILE="/root/proxy_qr_${USER}.png"
-    qrencode -o "$QR_FILE" "$LINK" 2>/dev/null && local QR_OK=true || local QR_OK=false
+    qrencode -o "$QR_FILE" "$TG_LINK" 2>/dev/null && local QR_OK=true || local QR_OK=false
 
     echo ""
-    echo -e "${BLUE}  🔗 Ссылки для ${USER}:${NC}"
-    echo -e "  Полная:   ${CYAN}${LINK}${NC}"
-    if [[ -n "$SHORT" && "$SHORT" != *"error"* && ${#SHORT} -lt 60 ]]; then
-        echo -e "  Короткая: ${CYAN}${SHORT}${NC}"
+    echo -e "${BLUE}  📱 Telegram:${NC}"
+    echo -e "  Полная:   ${CYAN}${TG_LINK}${NC}"
+    if [[ -n "$TG_SHORT" && "$TG_SHORT" != *"error"* && ${#TG_SHORT} -lt 60 ]]; then
+        echo -e "  Короткая: ${CYAN}${TG_SHORT}${NC}"
     fi
     if [[ "$QR_OK" == true ]]; then
         echo -e "  QR-код:   ${CYAN}${QR_FILE}${NC}"
     fi
+
+    # --- Браузер ---
+    local BROWSER_LINK="socks5://${USER}:${PASS}@${SERVER_IP}:${PORT}"
+    local BR_ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${BROWSER_LINK}', safe=''))" 2>/dev/null)
+    local BR_SHORT=$(curl -s "https://clck.ru/--?url=${BR_ENCODED}" 2>/dev/null || echo "")
+    local BR_QR_FILE="/root/proxy_browser_qr_${USER}.png"
+    qrencode -o "$BR_QR_FILE" "$BROWSER_LINK" 2>/dev/null
+
+    echo ""
+    echo -e "${MAGENTA}  🌐 Браузер (SwitchyOmega / Firefox):${NC}"
+    echo -e "  Строка:   ${CYAN}${BROWSER_LINK}${NC}"
+    if [[ -n "$BR_SHORT" && "$BR_SHORT" != *"error"* && ${#BR_SHORT} -lt 60 ]]; then
+        echo -e "  Короткая: ${CYAN}${BR_SHORT}${NC}"
+    fi
+    echo -e "  QR-код:   ${CYAN}${BR_QR_FILE}${NC}"
+    echo ""
+    echo -e "${YELLOW}  Firefox → Настройки → Прокси → Вручную → SOCKS5 → включить DNS через SOCKS5${NC}"
+    echo -e "${YELLOW}  Chrome  → Расширение Proxy SwitchyOmega → New Profile → SOCKS5${NC}"
 }
 
 # --- Итог ---
@@ -145,9 +167,6 @@ if [[ "$STATUS" == "active" ]]; then
     echo -e "  Логин:   ${CYAN}${USERNAME}${NC}"
     echo -e "  Пароль:  ${CYAN}${PASSWORD}${NC}"
     generate_links "$USERNAME" "$PASSWORD"
-    echo ""
-    echo -e "${YELLOW}  Нажмите на ссылку или отправьте её — Telegram подключится автоматически${NC}"
-    echo ""
 else
     echo -e "${RED}[!] Dante не запустился. Проверьте лог:${NC}"
     echo "    journalctl -u danted -n 20"
@@ -182,7 +201,6 @@ while [[ "$ADD_MORE" == "y" || "$ADD_MORE" == "Y" ]]; do
     echo -e "${GREEN}[✓] Пользователь ${NEW_USER} добавлен!${NC}"
     generate_links "$NEW_USER" "$NEW_PASS"
 
-    echo ""
     read -p "$(echo -e ${YELLOW})[?] Добавить ещё? (y/n): $(echo -e ${NC})" ADD_MORE
 done
 
