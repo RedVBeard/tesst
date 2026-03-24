@@ -5,5 +5,5 @@ bash <(curl -Ls https://raw.githubusercontent.com/nova-shelf/maybe-works/main/hy
 bash <(curl -Ls https://raw.githubusercontent.com/nova-shelf/maybe-works/main/hysteria2-setup.sh)
 ```
 ```bash
-bash <(cul -Ls https://raw.githubusercontent.com/nova-shelf/maybe-works/main/install_hysteria2_new.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/nova-shelf/maybe-works/main/install_hysteria2_new.sh)
 ```
