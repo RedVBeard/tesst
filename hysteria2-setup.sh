@@ -25,13 +25,17 @@ echo ""
 
 # ─── Запрос данных ───────────────────────
 
-read -rp "$(echo -e ${CYAN}Домен (например hystnod.duckdns.org): ${NC})" DOMAIN
-read -rp "$(echo -e ${CYAN}Email для Let'\''s Encrypt: ${NC})" EMAIL
+echo -e "${CYAN}Домен (например hystnod.duckdns.org):${NC}"
+read -rp "> " DOMAIN
+echo -e "${CYAN}Email для Let's Encrypt:${NC}"
+read -rp "> " EMAIL
 
 while true; do
-    read -rsp "$(echo -e ${CYAN}Пароль для подключения: ${NC})" PASSWORD
+    echo -e "${CYAN}Пароль для подключения:${NC}"
+    read -rsp "> " PASSWORD
     echo ""
-    read -rsp "$(echo -e ${CYAN}Повторите пароль: ${NC})" PASSWORD2
+    echo -e "${CYAN}Повторите пароль:${NC}"
+    read -rsp "> " PASSWORD2
     echo ""
     if [ "$PASSWORD" = "$PASSWORD2" ]; then
         break
