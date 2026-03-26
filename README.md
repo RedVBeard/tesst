@@ -10,3 +10,6 @@ bash <(curl -Ls https://raw.githubusercontent.com/nova-shelf/maybe-works/main/in
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/nova-shelf/maybe-works/main/install_hysteria2.sh)
 ```
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/nova-shelf/maybe-works/main/setup_socks5.sh)
+```
